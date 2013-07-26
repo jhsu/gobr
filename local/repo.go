@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Get a range of local branches.
+// Branches gets a range of local git branches.
 func Branches() []string {
 	cmd := exec.Command("git", "branch")
 	var out bytes.Buffer
@@ -25,6 +25,7 @@ func Branches() []string {
 	return names
 }
 
+// SetBranch changes the current git branch.
 func SetBranch(branch string) {
 	cmd := exec.Command("git", "checkout", branch)
 	err := cmd.Run()

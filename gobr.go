@@ -7,11 +7,11 @@ import (
 
 func redraw(branches []string) {
 	for line, branch := range branches {
-		draw_line(line, branch)
+		drawLine(line, branch)
 	}
 }
 
-func draw_line(line int, text string) {
+func drawLine(line int, text string) {
 	x := 0
 	for _, c := range text {
 		termbox.SetCell(x, line, c, termbox.ColorDefault, termbox.ColorDefault)
@@ -19,7 +19,7 @@ func draw_line(line int, text string) {
 	}
 }
 
-func select_line(line int, text string) {
+func selectLine(line int, text string) {
 	x := 0
 	for _, c := range text {
 		termbox.SetCell(x, line, c, termbox.ColorBlack, termbox.ColorWhite)
@@ -39,7 +39,7 @@ func main() {
 	branches := gobr.Branches()
 	cb := 0
 	redraw(branches)
-	select_line(cb, branches[cb])
+	selectLine(cb, branches[cb])
 	termbox.Flush()
 
 loop:
@@ -53,13 +53,13 @@ loop:
 				if cb < (len(branches) - 1) {
 					cb++
 					redraw(branches)
-					select_line(cb, branches[cb])
+					selectLine(cb, branches[cb])
 				}
 			case 107: // up
 				if cb > 0 {
 					cb--
 					redraw(branches)
-					select_line(cb, branches[cb])
+					selectLine(cb, branches[cb])
 				}
 			}
 
