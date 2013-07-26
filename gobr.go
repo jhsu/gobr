@@ -1,14 +1,38 @@
-package gobr
+package main
 
-import "github.com/nsf/termbox-go"
-import "time"
-import "fmt"
+import(
+  "time"
+  "github.com/nsf/termbox-go"
+  "github.com/jhsu/gobr/local"
+)
 
-type key struct {
-	ch rune
+// 106 - j
+// 107 - k
+
+func clear_selection() {
 }
 
-const hello_world = "Hello, World!"
+func redraw(branches []string) {
+  for line, branch := range branches {
+    draw_line(line, branch)
+  }
+}
+
+func draw_line(line int, text string) {
+  x := 0
+  for _, c := range text {
+    termbox.SetCell(x, line, c, termbox.ColorDefault, termbox.ColorDefault)
+    x++
+  }
+}
+
+func select_line(line int, text string) {
+  x := 0
+  for _, c := range text {
+    termbox.SetCell(x, line, c, termbox.ColorBlack, termbox.ColorWhite)
+    x++
+  }
+}
 
 func main() {
 	time.Sleep(1 * time.Second)
@@ -19,23 +43,43 @@ func main() {
 	defer termbox.Close()
 
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-	x := 0
-	for _, c := range hello_world {
-		termbox.SetCell(x, 0, c, termbox.ColorWhite, termbox.ColorDefault)
-		x++
-	}
+
+  branches := gobr.Branches()
+  cb := 0
+  redraw(branches)
+  select_line(cb, branches[cb])
 	termbox.Flush()
 
-loop:
-	for {
-		switch ev := termbox.PollEvent(); ev.Type {
-		case termbox.EventKey:
-      fmt.Println(ev.Ch)
-      if ev.Ch == 113 {
-        break loop
+  loop:
+    for {
+      switch ev := termbox.PollEvent(); ev.Type {
+      case termbox.EventKey:
+        switch ev.Ch {
+        case 113:
+          break loop
+        case 106: // down
+          if cb < (len(branches) - 1) {
+            cb++
+            redraw(branches)
+            select_line(cb, branches[cb])
+          }
+        case 107: // up
+          if cb > 0 {
+            cb--
+            redraw(branches)
+            select_line(cb, branches[cb])
+          }
+        }
+
+        switch ev.Key {
+          case termbox.KeyEnter:
+            gobr.SetBranch(branches[cb])
+            break loop
+        }
+
+        termbox.Flush()
+      case termbox.EventError:
+        panic(ev.Err)
       }
-		case termbox.EventError:
-			panic(ev.Err)
-		}
-	}
+    }
 }

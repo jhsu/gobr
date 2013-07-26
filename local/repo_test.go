@@ -6,5 +6,5 @@ import (
 )
 
 func TestBranches(t *testing.T) {
-  assert.Equal(t, []string{"master", "production"}, Branches())
+  assert.Equal(t, []string{"master"}, Branches())
 }
