@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gobr"
 	"github.com/nsf/termbox-go"
+	"gobr"
 )
 
 func redraw(branches []string) {
