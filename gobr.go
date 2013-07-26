@@ -1,41 +1,33 @@
 package main
 
-import(
-  "time"
-  "github.com/nsf/termbox-go"
-  "github.com/jhsu/gobr/local"
+import (
+	"github.com/jhsu/gobr/local"
+	"github.com/nsf/termbox-go"
 )
 
-// 106 - j
-// 107 - k
-
-func clear_selection() {
-}
-
 func redraw(branches []string) {
-  for line, branch := range branches {
-    draw_line(line, branch)
-  }
+	for line, branch := range branches {
+		draw_line(line, branch)
+	}
 }
 
 func draw_line(line int, text string) {
-  x := 0
-  for _, c := range text {
-    termbox.SetCell(x, line, c, termbox.ColorDefault, termbox.ColorDefault)
-    x++
-  }
+	x := 0
+	for _, c := range text {
+		termbox.SetCell(x, line, c, termbox.ColorDefault, termbox.ColorDefault)
+		x++
+	}
 }
 
 func select_line(line int, text string) {
-  x := 0
-  for _, c := range text {
-    termbox.SetCell(x, line, c, termbox.ColorBlack, termbox.ColorWhite)
-    x++
-  }
+	x := 0
+	for _, c := range text {
+		termbox.SetCell(x, line, c, termbox.ColorBlack, termbox.ColorWhite)
+		x++
+	}
 }
 
 func main() {
-	time.Sleep(1 * time.Second)
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
@@ -44,42 +36,42 @@ func main() {
 
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-  branches := gobr.Branches()
-  cb := 0
-  redraw(branches)
-  select_line(cb, branches[cb])
+	branches := gobr.Branches()
+	cb := 0
+	redraw(branches)
+	select_line(cb, branches[cb])
 	termbox.Flush()
 
-  loop:
-    for {
-      switch ev := termbox.PollEvent(); ev.Type {
-      case termbox.EventKey:
-        switch ev.Ch {
-        case 113:
-          break loop
-        case 106: // down
-          if cb < (len(branches) - 1) {
-            cb++
-            redraw(branches)
-            select_line(cb, branches[cb])
-          }
-        case 107: // up
-          if cb > 0 {
-            cb--
-            redraw(branches)
-            select_line(cb, branches[cb])
-          }
-        }
+loop:
+	for {
+		switch ev := termbox.PollEvent(); ev.Type {
+		case termbox.EventKey:
+			switch ev.Ch {
+			case 113:
+				break loop
+			case 106: // down
+				if cb < (len(branches) - 1) {
+					cb++
+					redraw(branches)
+					select_line(cb, branches[cb])
+				}
+			case 107: // up
+				if cb > 0 {
+					cb--
+					redraw(branches)
+					select_line(cb, branches[cb])
+				}
+			}
 
-        switch ev.Key {
-          case termbox.KeyEnter:
-            gobr.SetBranch(branches[cb])
-            break loop
-        }
+			switch ev.Key {
+			case termbox.KeyEnter:
+				gobr.SetBranch(branches[cb])
+				break loop
+			}
 
-        termbox.Flush()
-      case termbox.EventError:
-        panic(ev.Err)
-      }
-    }
+			termbox.Flush()
+		case termbox.EventError:
+			panic(ev.Err)
+		}
+	}
 }
