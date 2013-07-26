@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jhsu/gobr/local"
+	"gobr"
 	"github.com/nsf/termbox-go"
 )
 
