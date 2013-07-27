@@ -1,31 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"github.com/nsf/termbox-go"
-	"gobr"
+	"os/exec"
+	"strings"
 )
-
-func redraw(branches []string) {
-	for line, branch := range branches {
-		drawLine(line, branch)
-	}
-}
-
-func drawLine(line int, text string) {
-	x := 0
-	for _, c := range text {
-		termbox.SetCell(x, line, c, termbox.ColorDefault, termbox.ColorDefault)
-		x++
-	}
-}
-
-func selectLine(line int, text string) {
-	x := 0
-	for _, c := range text {
-		termbox.SetCell(x, line, c, termbox.ColorBlack, termbox.ColorWhite)
-		x++
-	}
-}
 
 func main() {
 	err := termbox.Init()
@@ -36,7 +16,7 @@ func main() {
 
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-	branches := gobr.Branches()
+	branches := branches()
 	cb := 0
 	redraw(branches)
 	selectLine(cb, branches[cb])
@@ -65,7 +45,7 @@ loop:
 
 			switch ev.Key {
 			case termbox.KeyEnter:
-				gobr.SetBranch(branches[cb])
+				setBranch(branches[cb])
 				break loop
 			}
 
@@ -73,5 +53,55 @@ loop:
 		case termbox.EventError:
 			panic(ev.Err)
 		}
+	}
+}
+
+func redraw(branches []string) {
+	for line, branch := range branches {
+		drawLine(line, branch)
+	}
+}
+
+func drawLine(line int, text string) {
+	x := 0
+	for _, c := range text {
+		termbox.SetCell(x, line, c, termbox.ColorDefault, termbox.ColorDefault)
+		x++
+	}
+}
+
+func selectLine(line int, text string) {
+	x := 0
+	for _, c := range text {
+		termbox.SetCell(x, line, c, termbox.ColorBlack, termbox.ColorWhite)
+		x++
+	}
+}
+
+// Branches gets a range of local git branches.
+func branches() []string {
+	cmd := exec.Command("git", "branch")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+	branches := strings.Fields(out.String())
+	names := []string{}
+	for _, name := range branches {
+		if name != "" && name != "*" {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// SetBranch changes the current git branch.
+func setBranch(branch string) {
+	cmd := exec.Command("git", "checkout", branch)
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
 	}
 }
