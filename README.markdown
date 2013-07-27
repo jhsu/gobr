@@ -1,9 +1,11 @@
-# GoBr
+# gobr
 
 Curses git branch switching.
 
-## Developing
+## Installing
 
 ```
-export GOPATH=`pwd`
+go install github.com/jhsu/gobr
 ```
+
+![example](gobr.gif)
